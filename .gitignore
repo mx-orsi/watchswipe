@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# Build
+*.tsbuildinfo
+next-env.d.ts
+
+# Env (never commit secrets)
+.env
+.env.local
+.env.*.local
+
+# Debug
+npm-debug.log*
+.DS_Store
+
+# IDE / Cursor
+.cursor/
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Vercel
+.vercel
