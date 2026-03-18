@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { SavedWatch, Watch } from "@/types/watch";
 import { seedWatches } from "@/lib/data/seedWatches";
+import { STORAGE_KEYS } from "@/lib/storage/keys";
 
 interface WatchState {
   watches: Watch[];
@@ -28,7 +29,7 @@ interface WatchState {
   reset: () => void;
 }
 
-const STORAGE_KEY = "watchswipe_watch_state_v1";
+const STORAGE_KEY = STORAGE_KEYS.watchState;
 
 function loadInitialState() {
   if (typeof window === "undefined") {
@@ -40,9 +41,13 @@ function loadInitialState() {
     const parsed = JSON.parse(raw) as Partial<WatchState> & {
       likedIds?: string[];
     };
+    // Corrupted or legacy shape can leave saved non-array — never throw on .length / .filter
+    const savedRaw = parsed.saved;
+    const saved = Array.isArray(savedRaw) ? savedRaw : [];
     return {
-      currentIndex: parsed.currentIndex ?? 0,
-      saved: parsed.saved ?? [],
+      currentIndex:
+        typeof parsed.currentIndex === "number" ? parsed.currentIndex : 0,
+      saved,
       likedIds: new Set<string>(parsed.likedIds ?? []),
       totalSwipes: parsed.totalSwipes ?? 0,
       totalLikes: parsed.totalLikes ?? 0,

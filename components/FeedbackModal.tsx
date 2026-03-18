@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { STORAGE_KEYS } from "@/lib/storage/keys";
 
 interface FeedbackModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-const STORAGE_KEY = "watchswipe_feedback_v1";
+const STORAGE_KEY = STORAGE_KEYS.feedbackQueue;
 
 export function FeedbackModal({ open, onOpenChange }: FeedbackModalProps) {
   const [confused, setConfused] = useState("");
@@ -41,7 +42,8 @@ export function FeedbackModal({ open, onOpenChange }: FeedbackModalProps) {
     if (typeof window !== "undefined") {
       try {
         const raw = window.localStorage.getItem(STORAGE_KEY);
-        const existing = raw ? (JSON.parse(raw) as unknown[]) : [];
+        const parsed = raw ? JSON.parse(raw) : [];
+        const existing = Array.isArray(parsed) ? parsed : [];
         existing.push(payload);
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
       } catch {

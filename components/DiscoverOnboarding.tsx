@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { STORAGE_KEYS } from "@/lib/storage/keys";
 
-const STORAGE_KEY = "watchswipe_discover_onboarding_seen";
+// Not mounted by default — import on /discover if first-visit hints are desired.
+const STORAGE_KEY = STORAGE_KEYS.discoverOnboardingSeen;
 
 export function DiscoverOnboarding() {
   const [visible, setVisible] = useState(false);

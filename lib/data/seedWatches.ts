@@ -1,5 +1,10 @@
 import { Watch } from "@/types/watch";
 
+/**
+ * In-app catalog source of truth for swipe/detail UI.
+ * TODO: Eventually move to a DB-backed catalog (Supabase watches/watch_variants)
+ * and load via API; keep seed in sync with supabase/seed.sql until then.
+ */
 export const seedWatches: Watch[] = [
   {
     id: "baltic-aquascaphe",

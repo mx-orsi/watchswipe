@@ -1,14 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useWatchStore } from "@/lib/store/watchStore";
-import { useAuth } from "@/lib/auth/DemoAuthContext";
+import { useAuth } from "@/lib/auth";
 import { AuthModal } from "@/components/AuthModal";
 import { SwipeCard } from "@/components/SwipeCard";
 
 export default function DiscoverPage() {
-  const router = useRouter();
   const { user } = useAuth();
   const { getCurrent, swipePass, swipeLove, saveWatch, resetIndex } =
     useWatchStore();
@@ -122,7 +120,7 @@ export default function DiscoverPage() {
   return (
     <>
       <div className="flex h-full flex-col">
-        <header className="flex items-center justify-between pt-1">
+        <header className="flex items-center pt-1">
           <div className="space-y-0.5">
             <p className="text-[0.7rem] uppercase tracking-[0.2em] text-muted">
               Discover
@@ -131,13 +129,6 @@ export default function DiscoverPage() {
               Swipe microbrand picks
             </h1>
           </div>
-          <button
-            type="button"
-            onClick={() => router.push("/collection")}
-            className="touch-target rounded-full border border-borderSoft/80 bg-surfaceElevated/80 px-3 py-1.5 text-[0.7rem] text-muted transition-colors hover:border-accent/30 hover:text-white"
-          >
-            My Collection
-          </button>
         </header>
 
         <div className="mt-4 flex flex-1 flex-col gap-4 pb-1">

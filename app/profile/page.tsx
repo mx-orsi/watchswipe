@@ -1,15 +1,20 @@
- "use client";
+"use client";
 
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { useAuth } from "@/lib/auth/DemoAuthContext";
+import { useAuth } from "@/lib/auth";
 import { AuthModal } from "@/components/AuthModal";
 import { useWatchStore } from "@/lib/store/watchStore";
 import { FeedbackModal } from "@/components/FeedbackModal";
 
+function safeSavedCount(saved: unknown): number {
+  return Array.isArray(saved) ? saved.length : 0;
+}
+
 export default function ProfilePage() {
   const { user, signOut } = useAuth();
   const { saved } = useWatchStore();
+  const savedCount = safeSavedCount(saved);
   const [authOpen, setAuthOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
@@ -64,7 +69,7 @@ export default function ProfilePage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-muted">My Collection</p>
-              <p className="text-sm font-medium">{saved.length} saved</p>
+              <p className="text-sm font-medium">{savedCount} saved</p>
             </div>
           </div>
           <p className="text-[0.75rem] text-muted">

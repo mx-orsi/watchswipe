@@ -1,3 +1,8 @@
+/**
+ * Supabase persistence for saved watches.
+ * TODO: Unify with watchStore — Discover swipe-save only updates local state today;
+ * detail page also calls saveWatchForUser. Align flows after real auth ships.
+ */
 import { SavedWatch } from "@/types/watch";
 import { getSupabaseClient } from "@/lib/supabase/client";
 

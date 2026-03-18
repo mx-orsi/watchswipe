@@ -107,18 +107,19 @@ export function DevPanel() {
               .slice()
               .reverse()
               .slice(0, 10)
-              .map((e, idx) => (
+              .map((e, idx) => {
+                const p = e.properties ?? {};
+                return (
                 <li key={`${e.timestamp}-${e.event}-${idx}`}>
                   <span className="text-accent">{e.event}</span>
                   {" — "}
                   <span className="text-muted">
-                    {e.properties.brand} {e.properties.model}{" "}
-                    {e.properties.color_name
-                      ? `(${e.properties.color_name})`
-                      : ""}
+                    {p.brand} {p.model}{" "}
+                    {p.color_name ? `(${p.color_name})` : ""}
                   </span>
                 </li>
-              ))}
+                );
+              })}
             {events.length === 0 && (
               <li className="text-[0.6rem] text-muted">No events yet.</li>
             )}

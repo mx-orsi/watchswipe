@@ -1,136 +1,96 @@
 # WatchSwipe
 
-WatchSwipe is a visual discovery MVP for microbrand watches. Users can swipe through curated models, view details, and save specific color variants into a personal collection. The experience is mobile-first, dark-mode, and designed to feel like a native app inside a centered “phone” frame.
+WatchSwipe is a **visual discovery MVP** for microbrand watches. Users swipe through a curated catalog, open watch detail pages, and save color variants into a personal collection. The UI is mobile-first, dark-mode, and wrapped in a centered “phone” frame.
+
+## Quick start
+
+```bash
+npm install
+cp .env.example .env.local   # add Supabase URL + anon key if you use remote saves
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+Build: `npm run build` · Start prod: `npm run start` · Lint: `npm run lint`  
+If build fails with cache issues: `npm run clean && npm run build` (or `npm run build:clean`).
+
+## Project structure
+
+| Area | Location | Purpose |
+|------|----------|--------|
+| **Catalog data** | `lib/data/seedWatches.ts` | Curated watch + variant list (powers swipe stack and detail). Mirror changes in `supabase/seed.sql` if you use Supabase. |
+| **Auth** | `lib/auth/demoAuth.tsx`, `lib/auth/index.ts` | **Demo auth** — in-memory user only; no real Supabase Auth session. Replace when wiring production auth. |
+| **Client state** | `lib/store/watchStore.ts` | Zustand store: swipe position, saved items, counters; persisted under `watchswipe_watch_state_v1`. |
+| **Supabase** | `lib/supabase/client.ts`, `savedWatches.ts`, `SupabaseProvider.tsx` | Client singleton + `saved_watches` CRUD. Used when persisting saves remotely (detail page calls both store + Supabase). |
+| **Analytics** | `lib/analytics/track.ts` | `trackEvent` + dev buffer when `NEXT_PUBLIC_TEST_MODE=true`. |
+| **Persistence keys** | `lib/storage/keys.ts` | Single list of `localStorage` key names. |
+| **App shell / nav** | `components/MobileAppShell.tsx`, `BottomNav.tsx` | Layout + bottom nav. |
+| **Pages** | `app/` | App Router: `/`, `/discover`, `/watch/[id]`, `/collection`, `/profile`. |
 
 ## Tech stack
 
 - Next.js 14 (App Router, TypeScript)
-- React 18
-- Tailwind CSS
-- Framer Motion
-- Supabase (auth + `saved_watches` persistence)
+- React 18, Tailwind CSS, Framer Motion
 - Zustand (client state)
-
-## Core features
-
-- **Home**: Hero landing with “Start Swiping”, watch of the day, and featured brands.
-- **Discover**: Primary swipe interface with drag-to-swipe, color variant selector, and Pass / Save / Love actions.
-- **Watch detail**: Large gallery, specs, color selector, Save to Collection, and Visit Brand link.
-- **Collection**: “My Collection” grid of saved watch + variant pairs with remove support.
-- **Profile**: Shows logged-in email, saved count, and a “watch personality” placeholder.
-- **Auth**: Email/password via Supabase Auth, only required when saving/removing watches.
-
-## Pages & navigation
-
-- `/` – Home (landing, CTA to `/discover`)
-- `/discover` – Swipe experience
-- `/watch/[id]` – Watch detail
-- `/collection` – Saved watches
-- `/profile` – Profile, logout, and future “personality” section
-
-A fixed bottom nav (`Discover`, `Collection`, `Profile`) keeps navigation accessible on mobile.
-
-## Data model
-
-Supabase tables (see `supabase/schema.sql`):
-
-- `watches`
-  - `id` (text, PK)
-  - `brand`, `model`
-  - `base_price` (numeric)
-  - `case_size` (text)
-  - `movement` (text)
-  - `water_resistance` (text)
-  - `category` (text)
-  - `description` (text)
-  - `brand_url` (text)
-  - `created_at` (timestamptz, default now)
-- `watch_variants`
-  - `id` (text, PK)
-  - `watch_id` (FK → `watches.id`)
-  - `color_name`, `image_url`, `hex_color`
-  - `price_override` (numeric, nullable)
-  - `created_at` (timestamptz)
-- `saved_watches`
-  - `id` (uuid, PK, default `gen_random_uuid()`)
-  - `user_id` (uuid, FK → `auth.users.id`)
-  - `watch_id` (FK → `watches.id`)
-  - `watch_variant_id` (FK → `watch_variants.id`)
-  - `created_at` (timestamptz)
-
-The app itself keeps a curated `seedWatches` array in `lib/data/seedWatches.ts` that mirrors the `watches`/`watch_variants` tables and powers the swipe stack.
-
-## Supabase seed data
-
-Seed SQL: `supabase/seed.sql`.
-
-- Inserts 12 microbrand watches (Baltic, Lorier, Traska, Zelos, Nodus, Farer, Serica, Studio Underd0g).
-- Each has 2–4 `watch_variants` with `color_name`, `image_url`, and `hex_color`.
-- `saved_watches` is intentionally empty; you can add rows for testing if desired.
+- Supabase JS (optional — `saved_watches` when configured)
+- react-hot-toast
 
 ## Environment variables
 
-Copy `.env.example` to `.env.local` and fill in:
+Copy `.env.example` to `.env.local`:
 
-```bash
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
-```
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | For remote saves | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | For remote saves | Supabase anon key |
+| `NEXT_PUBLIC_TEST_MODE` | No | Set to `true` to enable DevPanel + analytics buffer (dev only) |
 
-These are used by `lib/supabase/client.ts` to create the Supabase client.
+Without Supabase env, the app still runs; the client uses placeholders and console warns once.
 
-## Local setup
+## Core features
 
-```bash
-npm install
-cp .env.example .env.local   # then set your Supabase values
-```
+- **Home** — Landing, watch of the day, featured brands.
+- **Discover** — Swipe stack, color selector, Pass / Save / Like.
+- **Watch detail** — Gallery, specs, Save to Collection, brand link.
+- **Collection** — Grid of saved watch+variant pairs.
+- **Profile** — Account placeholder, feedback modal, logout (demo).
 
-1. **Create Supabase project** in the Supabase dashboard.
-2. **Run schema**:
-   - In the Supabase SQL editor, paste and run `supabase/schema.sql`.
-3. **Run seed**:
-   - In the SQL editor, paste and run `supabase/seed.sql`.
-4. **Start dev server**:
+## Data model (Supabase)
 
-```bash
-npm run dev
-```
+See `supabase/schema.sql` — tables include `watches`, `watch_variants`, `saved_watches`. Seed data: `supabase/seed.sql`.
 
-Visit `http://localhost:3000`.
+## What’s demo vs production-ready
 
-### Build fails with `Cannot find module for page: /_document`
+| Aspect | Status |
+|--------|--------|
+| Swipe + catalog UI | Production-style |
+| **Auth** | **Demo only** — no Supabase Auth; single demo user concept |
+| **Discover Save** | Local store only — does not call `saveWatchForUser` |
+| **Detail Save** | Store + Supabase insert when configured |
+| **Catalog** | Static `seedWatches` — not loaded from DB at runtime |
 
-This is usually a **corrupted `.next` cache**. Clear it and rebuild:
+## Known limitations / tech debt
 
-```bash
-npm run clean
-npm run build
-```
+- **Demo auth** — Replace with Supabase Auth and session hydration so `user_id` matches `auth.users`.
+- **Split save flow** — Discover vs detail page handle persistence differently; unify once auth is real.
+- **Catalog** — Single TS source + SQL seed; eventual DB-backed catalog would remove duplication.
+- **DevPanel** — Not mounted in the shell by default (avoids runtime crashes if the analytics buffer has unexpected shape). With `NEXT_PUBLIC_TEST_MODE=true`, import `<DevPanel />` on a page when you want dev tools. `DiscoverOnboarding` remains opt-in.
 
-Or in one step: `npm run build:clean`. For dev: `npm run dev:clean`.
+## Replacing the catalog
 
-## Auth behavior
-
-- Browsing and swiping are available to guests.
-- When a guest taps **Save** (Discover or Watch Detail) or tries to remove from **Collection**, an `AuthModal` prompts login/sign-up.
-- After sign-in, the app:
-  - Loads `saved_watches` for the user into the local Zustand store.
-  - Keeps subsequent saves/removals in sync with Supabase (`lib/supabase/savedWatches.ts`).
+1. Edit `lib/data/seedWatches.ts`.
+2. Mirror structure in `supabase/seed.sql` if you rely on Supabase.
+3. Re-run seed in Supabase SQL editor when IDs or rows change.
 
 ## Vercel deployment
 
-1. Push this repo to GitHub.
-2. Create a new Vercel project pointing at the repo.
-3. Add environment variables in Vercel:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-4. Make sure your Supabase project has `schema.sql` and `seed.sql` applied.
-5. Deploy; Vercel will run `next build` automatically.
+1. Repo on GitHub → Vercel project.
+2. Env: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+3. Apply `schema.sql` + `seed.sql` in Supabase.
+4. Deploy (Vercel runs `next build`).
 
-## Replacing the watch catalog
+## Troubleshooting
 
-- Update `lib/data/seedWatches.ts` with your own brands, models, and variants.
-- Mirror those changes into `supabase/seed.sql` so the database stays in sync.
-- Re-run the seed file on Supabase if you change IDs or add new rows.
-
+**Build fails with `Cannot find module for page: /_document`**  
+Clear cache: `npm run clean` then `npm run build`.

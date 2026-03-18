@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import { Watch } from "@/types/watch";
 import { WatchDetailGallery } from "@/components/WatchDetailGallery";
 import { useWatchStore } from "@/lib/store/watchStore";
-import { useAuth } from "@/lib/auth/DemoAuthContext";
+import { useAuth } from "@/lib/auth";
 import { AuthModal } from "@/components/AuthModal";
 import { saveWatchForUser } from "@/lib/supabase/savedWatches";
 
@@ -35,6 +35,7 @@ export function WatchDetailClientSimple({ watch, initialVariantId }: Props) {
       setAuthOpen(true);
       return;
     }
+    // TODO: Unify with discover flow — single path that persists to Supabase and store.
     saveWatch(watch.id, activeVariant.id, user.id);
     void saveWatchForUser({
       userId: user.id,

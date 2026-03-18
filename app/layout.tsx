@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ReactNode } from "react";
 import { SupabaseProvider } from "@/lib/supabase/SupabaseProvider";
-import { AuthProvider } from "@/lib/auth/DemoAuthContext";
+import { AuthProvider } from "@/lib/auth";
 import { MobileAppShell } from "@/components/MobileAppShell";
 
 export const metadata: Metadata = {

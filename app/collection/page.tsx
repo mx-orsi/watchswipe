@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import toast from "react-hot-toast";
-import Link from "next/link";
 import { CollectionGrid } from "@/components/CollectionGrid";
 import { useWatchStore } from "@/lib/store/watchStore";
-import { useAuth } from "@/lib/auth/DemoAuthContext";
+import { useAuth } from "@/lib/auth";
 import { AuthModal } from "@/components/AuthModal";
 
 export default function CollectionPage() {
@@ -25,7 +24,7 @@ export default function CollectionPage() {
   return (
     <>
       <div className="flex h-full flex-col gap-5 pb-2">
-        <header className="flex items-center justify-between">
+        <header className="flex items-center">
           <div className="space-y-0.5">
             <p className="text-[0.7rem] uppercase tracking-[0.2em] text-muted">
               My Collection
@@ -39,12 +38,6 @@ export default function CollectionPage() {
               </p>
             )}
           </div>
-          <Link
-            href="/discover"
-            className="touch-target rounded-full border border-borderSoft/80 bg-surfaceElevated/80 px-3 py-1.5 text-[0.7rem] text-muted transition-colors hover:border-accent/30 hover:text-white"
-          >
-            Discover
-          </Link>
         </header>
 
         {!user && (

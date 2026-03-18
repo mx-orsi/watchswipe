@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * Demo auth provider — no real Supabase Auth session.
+ * TODO: Replace with real Supabase Auth (signInWithPassword/signUp via supabase.auth)
+ * and hydrate session on load so saved_watches sync is consistent.
+ */
 import {
   ReactNode,
   createContext,
@@ -86,4 +91,3 @@ export function useAuth(): AuthContextValue {
   }
   return ctx;
 }
-

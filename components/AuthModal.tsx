@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { useAuth } from "@/lib/auth/DemoAuthContext";
+import { useAuth } from "@/lib/auth";
 import toast from "react-hot-toast";
 
 interface AuthModalProps {

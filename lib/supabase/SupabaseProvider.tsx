@@ -16,6 +16,7 @@ export function SupabaseProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/** Call from components that need the Supabase client (e.g. after real auth). */
 export function useSupabaseClient(): SupabaseClient {
   const ctx = useContext(SupabaseContext);
   if (!ctx) {
